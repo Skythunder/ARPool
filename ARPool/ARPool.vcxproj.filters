@@ -30,6 +30,9 @@
     <ClCompile Include="HCTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BGContours.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif">

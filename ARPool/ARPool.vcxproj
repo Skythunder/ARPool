@@ -66,6 +66,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BackSub.cpp" />
+    <ClCompile Include="BGContours.cpp" />
     <ClCompile Include="BGTeste.cpp" />
     <ClCompile Include="CamTest.cpp" />
     <ClCompile Include="HCTest.cpp" />

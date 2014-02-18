@@ -485,6 +485,7 @@ void on_minsize_trackbar( int, void* )
 int main()
 {
     VideoCapture cap;
+	// Setup output video
 	nalpha=nalpha_slider=91;
 	nbeta=nbeta_slider=173;
 	ngama=ngama_slider=255;
