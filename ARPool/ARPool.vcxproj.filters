@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\bgslibraries">
+      <UniqueIdentifier>{1fa35f01-00c3-4916-a850-d7ed012300eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -33,6 +36,24 @@
     <ClCompile Include="BGContours.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BGLibs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\dp\DPZivkovicAGMMBGS.cpp">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\dp\Image.cpp">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\dp\ZivkovicAGMM.cpp">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClCompile>
+    <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClCompile>
+    <ClCompile Include="BallSegment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif">
@@ -51,5 +72,36 @@
     <None Include="pool.avi">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\dp\DPZivkovicAGMMBGS.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\dp\Image.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\IBGS.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\dp\ZivkovicAGMM.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\dp\Bgs.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\dp\BgsParams.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+    <ClInclude Include="package_bgs\StaticFrameDifferenceBGS.h">
+      <Filter>Resource Files\bgslibraries</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ARPool.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

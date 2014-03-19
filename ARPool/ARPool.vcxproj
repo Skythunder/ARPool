@@ -43,7 +43,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>D:\Libraries\opencv247\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\opencv247\build\include;C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\package_bgs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -57,19 +57,28 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>D:\Libraries\opencv247\build\include;C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\package_bgs;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:\Libraries\opencv247\build\x86\vc11\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_core247.lib;opencv_imgproc247.lib;opencv_highgui247.lib;opencv_ml247.lib;opencv_video247.lib;opencv_features2d247.lib;opencv_calib3d247.lib;opencv_objdetect247.lib;opencv_contrib247.lib;opencv_legacy247.lib;opencv_flann247.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BackSub.cpp" />
+    <ClCompile Include="BallSegment.cpp" />
     <ClCompile Include="BGContours.cpp" />
+    <ClCompile Include="BGLibs.cpp" />
     <ClCompile Include="BGTeste.cpp" />
     <ClCompile Include="CamTest.cpp" />
     <ClCompile Include="HCTest.cpp" />
+    <ClCompile Include="package_bgs\dp\DPZivkovicAGMMBGS.cpp" />
+    <ClCompile Include="package_bgs\dp\Image.cpp" />
+    <ClCompile Include="package_bgs\dp\ZivkovicAGMM.cpp" />
+    <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +90,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="pool.avi" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="package_bgs\dp\Bgs.h" />
+    <ClInclude Include="package_bgs\dp\BgsParams.h" />
+    <ClInclude Include="package_bgs\dp\DPZivkovicAGMMBGS.h" />
+    <ClInclude Include="package_bgs\dp\Image.h" />
+    <ClInclude Include="package_bgs\dp\ZivkovicAGMM.h" />
+    <ClInclude Include="package_bgs\IBGS.h" />
+    <ClInclude Include="package_bgs\StaticFrameDifferenceBGS.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ARPool.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

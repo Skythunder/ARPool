@@ -482,7 +482,7 @@ void on_minsize_trackbar( int, void* )
 {
  minsize = minsize_slider;
 }
-int main()
+int mainMain()
 {
     VideoCapture cap;
 	// Setup output video
