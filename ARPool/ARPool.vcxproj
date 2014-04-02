@@ -70,6 +70,7 @@
   <ItemGroup>
     <ClCompile Include="BackSub.cpp" />
     <ClCompile Include="BallSegment.cpp" />
+    <ClCompile Include="BallSegmentation.cpp" />
     <ClCompile Include="BGContours.cpp" />
     <ClCompile Include="BGLibs.cpp" />
     <ClCompile Include="BGTeste.cpp" />

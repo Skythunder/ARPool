@@ -55,17 +55,18 @@ int backsubtest()
     }
     namedWindow( "Capture ", CV_WINDOW_AUTOSIZE);
     namedWindow( "Foreground ", CV_WINDOW_AUTOSIZE );
+	namedWindow( "Background ", CV_WINDOW_AUTOSIZE );
     Mat frame,foreground,image,edges,canny,mogcanny,mask;
 	int balpha=166;
 	int bbeta=171;
 	cap>>frame;
 	mask=Mat::zeros(frame.size(),CV_32FC1);
 	//Acelerar a aprendizagem da mascara
-	image=frame.clone();
+	/*image=frame.clone();
 	GaussianBlur(image,image,Size(3, 3), 2, 2 );
 	Canny(image,canny,balpha,bbeta);
 	mask=canny.clone();
-	mask.convertTo(mask,CV_32FC1);
+	mask.convertTo(mask,CV_32FC1);*/
 	//
     for(;;)
     {
@@ -83,6 +84,7 @@ int backsubtest()
 		foreground=backsub(canny,mask,0.001);
         imshow( "Capture ",frame );
 		imshow("Foreground ",foreground);
+		imshow("Background ",mask);
 		char c = (char)waitKey(1);
         if( c == 27 )   
             break;
@@ -177,7 +179,7 @@ int newBallSegmentation()
 				bitwise_and(fcanny,aux,aux);//change to bgscanny
 				int nz=countNonZero(aux);
 				double per = nz/double(nzt);
-				if(per>0.01)
+				if(per>0.05)
 				{
 					drawContours( cleanMask, contours, i, color, -1, 8, hierarchy, 0, Point());
 				}
@@ -219,8 +221,8 @@ int colorbacksubtest()
 {
     VideoCapture cap;
     //cap.open(0); 
-    //cap.open("pool.avi"); 
-	cap.open("vid1.mp4"); 
+    cap.open("pool.avi"); 
+	//cap.open("vid1.mp4"); 
     if( !cap.isOpened() )
     {
 
@@ -253,7 +255,7 @@ int colorbacksubtest()
 		bitwise_not(foreground,aux);
 		foreground=colorbacksub(image,mask,0.1);
         imshow( "Capture ",frame );
-		imshow("Foreground ",foreground);
+		imshow("Foreground ",mask);
 		char c = (char)waitKey(1);
         if( c == 27 )   
             break;
@@ -262,9 +264,9 @@ int colorbacksubtest()
 	return 0;
 }
 
-int main()
+int mainNN()
 {
-	//backsubtest();
-	newBallSegmentation();
+	backsubtest();
+	//newBallSegmentation();
 	//colorbacksubtest();
 }
