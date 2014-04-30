@@ -18,27 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BackSub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BGTeste.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CamTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HCTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BGContours.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BGLibs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="package_bgs\dp\DPZivkovicAGMMBGS.cpp">
       <Filter>Resource Files\bgslibraries</Filter>
     </ClCompile>
@@ -51,15 +30,24 @@
     <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp">
       <Filter>Resource Files\bgslibraries</Filter>
     </ClCompile>
-    <ClCompile Include="BallSegment.cpp">
+    <ClCompile Include="BallSegmentation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BallSegmentation.cpp">
+    <ClCompile Include="camera_calibration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="projector_calibration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectionTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pattern.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -106,5 +94,10 @@
     <ResourceCompile Include="ARPool.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="in_VID5.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

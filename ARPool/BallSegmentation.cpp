@@ -87,7 +87,7 @@ int MixImgs(			cv::Mat *p_mat_in1,
 }
 
 
-int main (){
+int mainOFF (){
 
 	VideoCapture videocap;
 	videocap.open(VIDEOPATH);

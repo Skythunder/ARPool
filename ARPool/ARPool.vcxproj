@@ -68,22 +68,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BackSub.cpp" />
-    <ClCompile Include="BallSegment.cpp" />
     <ClCompile Include="BallSegmentation.cpp" />
-    <ClCompile Include="BGContours.cpp" />
-    <ClCompile Include="BGLibs.cpp" />
-    <ClCompile Include="BGTeste.cpp" />
-    <ClCompile Include="CamTest.cpp" />
-    <ClCompile Include="HCTest.cpp" />
+    <ClCompile Include="camera_calibration.cpp" />
     <ClCompile Include="package_bgs\dp\DPZivkovicAGMMBGS.cpp" />
     <ClCompile Include="package_bgs\dp\Image.cpp" />
     <ClCompile Include="package_bgs\dp\ZivkovicAGMM.cpp" />
     <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp" />
-    <ClCompile Include="Test.cpp" />
+    <ClCompile Include="ProjectionTest.cpp" />
+    <ClCompile Include="projector_calibration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif" />
+    <Image Include="pattern.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="vid1.mp4" />
@@ -104,6 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ARPool.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="in_VID5.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
