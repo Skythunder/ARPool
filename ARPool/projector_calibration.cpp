@@ -1,3 +1,7 @@
+/*Creates final calibration matrix. Press 'f' for fullscreen followed by 'c' for calibration.
+* Dependent on camera and projector position. Must recalibrate everytime either is moved.
+*/
+
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -16,9 +20,11 @@ using namespace cv;
 using namespace std;
 
 #define VIDEOPATH 0
+#define PROJECTOR_RESOLUTION Size(1400,1050)
 
-int mainOFF3()
+int mainOFF3()//set to main
 {
+	//Loading camera calibration data
 	const string inputSettingsFile = "out_camera_data.xml";
     FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings
 	if (!fs.isOpened())
@@ -29,11 +35,12 @@ int mainOFF3()
 	Mat cameraMatrix, distCoeffs;
 	fs["Camera_Matrix"]>>cameraMatrix;
 	fs["Distortion_Coefficients"]>>distCoeffs;
+	//preparing Chessboard pattern
 	Mat chess = imread("pattern.png");
-	resize(chess,chess,Size(1400,1050));
+	resize(chess,chess,PROJECTOR_RESOLUTION);
 	Size chessSize = cvSize(9,6);
 	bool fullscreen=false;
-
+	//Initializing camera
 	VideoCapture videocap;
 	videocap.open(VIDEOPATH);
 
@@ -54,53 +61,52 @@ int mainOFF3()
         puts("***Could not read from capture...***\n");
         return 0;
     }
+	//preparing variables
 	vector<Point2f> pointBufloc;
 	vector<Point2f> pointBufproj;
 	vector<Point2f> reprojectionBuf;
 	bool loop = true;
 	Mat res;
 	bool calib=false;
+	int times=0;
 	cvNamedWindow("Chessboard", CV_WINDOW_NORMAL);
+	//main loop
 	while(loop)
 	{
+		//loading and undistorting frame
 		videocap>>frame;
 		Mat temp = frame.clone();
 		undistort(temp,frame,cameraMatrix,distCoeffs);
-
+		//printing text on screen
 		int baseLine = 0;
-		char *msg="Press c to calibrate!";
+		char *msg="Press 'f' for fullscreen. Press 'c' to calibrate!";
 		Size textSize = getTextSize(msg, 1, 1, 1, &baseLine);
         Point textOrigin(frame.cols - 2*textSize.width - 10, frame.rows - 2*baseLine - 10);
 		const Scalar GREEN(0,255,0);
 		putText( frame, msg, textOrigin, 1, 1, GREEN);
-
+		//preparing threshold image for improved corner detection
 		Mat thresh;
 		cvtColor(frame,thresh,CV_BGR2GRAY);
 		adaptiveThreshold(thresh,thresh,255,ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY,55,0);
 		imshow("THRESH",thresh);
-
+		//finding chessboard corners visible from camera
 		bool found = findChessboardCorners( thresh, chessSize, pointBufproj, CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
-
+		//if not calibrated show detection
 		if(!calib)
 			drawChessboardCorners(frame,chessSize,Mat(pointBufproj),found);
-		
-		vector<Point2f> point;
+		//if reprojection matrix is set, transform points and show reprojected corners
 		reprojectionBuf.clear();
-
 		if (res.data)
 		{
-			/*for(int j=0;j<pointBufproj.size();j++)
-			{
-				Mat aux = res*Mat(pointBufproj[j], false);
-				aux.copyTo(Mat(point, false));
-				reprojectionBuf.push_back(point);
-			}*/
 			Mat invres = res.inv();
 			if(found)
 			{
 				perspectiveTransform(pointBufproj,reprojectionBuf,res);
-				cout<<pointBufproj.size()<<endl;
-				drawChessboardCorners(chess,chessSize,Mat(reprojectionBuf),found);
+				if(times==1)
+				{
+					times++;
+					drawChessboardCorners(chess,chessSize,Mat(reprojectionBuf),found);
+				}
 			}
 		}
 
@@ -112,12 +118,20 @@ int mainOFF3()
 		if(fullscreen)
 			cvSetWindowProperty("Chessboard", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 		else 
-			cvSetWindowProperty("Chessboard", CV_WND_PROP_AUTOSIZE, CV_WINDOW_NORMAL);
+			cvSetWindowProperty("Chessboard", CV_WND_PROP_AUTOSIZE, CV_WINDOW_NORMAL);//not working
 		if(c=='c'||c=='C')
 		{
 			calib=true;
 			if(found)
 			{
+				times++;
+				if(times>1)
+				{
+					times =1;
+					chess = imread("pattern.png");
+					resize(chess,chess,PROJECTOR_RESOLUTION);
+				}
+				//if calibrating, find corners of original image and calculate homography between local image and camera image
 				findChessboardCorners( chess, chessSize, pointBufloc,CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
 				res = findHomography(pointBufproj,pointBufloc);
 				//save matrix

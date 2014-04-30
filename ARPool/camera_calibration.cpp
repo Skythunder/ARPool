@@ -1,3 +1,7 @@
+/*Initial camera calibration tool based on OpenCV demo
+*print "pattern.png" and use for calibration
+* Many changes pending...
+*/
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -223,7 +227,7 @@ enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
 bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat& distCoeffs,
                            vector<vector<Point2f> > imagePoints );
 
-int mainOFF2()
+int mainOFF2()//set to main
 {
     help();
     Settings s;

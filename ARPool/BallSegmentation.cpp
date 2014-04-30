@@ -1,3 +1,6 @@
+/*Normal (RGB) camera Ball segmentation. Will require infrared camera or filter 
+*to work with projected effects. Blob centroid calculation pending.
+*/
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/video/background_segm.hpp"
@@ -10,14 +13,16 @@
 using namespace std;
 using namespace cv;
 
+//choose video
 //#define VIDEOPATH "vid1.mp4"
 //#define VIDEOPATH "vid2.mp4"
 #define VIDEOPATH "pool.avi"
 //#define VIDEOPATH "The Rocket Quickfire.mp4"
 
+//set repeat
 #define REPEATVIDEO 1
 
-
+//parameter definition
 #define CANNY_L 100
 #define CANNY_H 150
 #define CANNY_ALPHA_UPDATE 0.001
@@ -35,6 +40,7 @@ using namespace cv;
 #define MIN_PERCENT_MASK 0.05
 #define MASK_START 1500;
 
+//mix images
 int MixImgs(			cv::Mat *p_mat_in1,
 						cv::Mat *p_mat_in2,
 						cv::Mat *p_mat_dst,
@@ -87,8 +93,8 @@ int MixImgs(			cv::Mat *p_mat_in1,
 }
 
 
-int mainOFF (){
-
+int mainOFF (){//set to main
+	//initialize camera
 	VideoCapture videocap;
 	videocap.open(VIDEOPATH);
 
@@ -104,7 +110,7 @@ int mainOFF (){
 	videocap >> img_frame;
 	if(img_frame.empty())
 			return 0;
-
+	//resize image to improve speed
 	int imgW = img_frame.cols;
 	float rel = 1;
 	if(imgW>OPT_WINDOW_WIDTH){
@@ -115,10 +121,10 @@ int mainOFF (){
 	Mat img_gray;
 	Mat img_gray_bg = Mat::zeros(img_src.size(),CV_32FC1);
 	Mat img_gray_fg = Mat(img_src.size(),CV_8UC1);
-
+	//blur to reduce noise
 	Mat blur;
 	GaussianBlur(img_src,blur,Size(3, 3), 2, 2 );
-
+	//get gray image
 	cvtColor(blur,img_gray,CV_BGR2GRAY);
 	imshow("Gray",img_gray);
 	img_gray.convertTo(img_gray_bg,CV_32FC1);
@@ -126,14 +132,14 @@ int mainOFF (){
 	namedWindow("Control");
 	int canny_l = CANNY_L;
 	int canny_h = CANNY_H;
-
+	//canny control
 	createTrackbar("Canny L","Control",&canny_l,255);
 	createTrackbar("Canny H","Control",&canny_h,255);
 
 	Mat img_canny;
 	Mat img_canny_bg = Mat::zeros(img_src.size(),CV_32FC1);
 	Mat img_canny_fg = Mat(img_src.size(),CV_8UC1);
-
+	//get initial canny
 	Canny(img_gray,img_canny,canny_l, canny_h);
 	imshow("Canny",img_canny);
 	img_canny.convertTo(img_canny_bg,CV_32FC1);
@@ -145,7 +151,7 @@ int mainOFF (){
 	Mat img_gray_diff;
 	Mat img_diff_hist = Mat(img_src.size(),CV_8UC1);;
 	Mat pseudocolor = Mat(img_src.size(),CV_8UC3);
-
+	//prepare initial (white - all pixels) mask
 	////////////////////////////////////
 	Mat weight_mask = Mat::zeros(img_src.size(),CV_8U);
 	bitwise_not(weight_mask,weight_mask);
@@ -153,8 +159,11 @@ int mainOFF (){
 	////////////////////////////////////
 	int mcnt = 0;
 	int mstart = MASK_START;
+	//main loop
 	while(1){
+		//read frame
 		videocap >> img_frame;
+		//set repeat if necessary
 		if(img_frame.empty()){
 			if(	REPEATVIDEO ){
 				videocap.set(CV_CAP_PROP_POS_FRAMES,0);
@@ -169,38 +178,39 @@ int mainOFF (){
 			
 		}
 		cv::resize(img_frame, img_src, cv::Size(img_frame.cols/rel,img_frame.rows/rel),0,0,1);
-	
+		//show original
 		imshow("Src",img_src);
 
+		//blur to reduce noise
 		/////////////////////////////////
 		GaussianBlur(img_src,blur,Size(3, 3), 2, 2 );
 		/////////////////////////////////
-
+		//get gray image
 		cvtColor(blur,img_gray,CV_BGR2GRAY);
 		imshow("Gray",img_gray);
-
+		//get gray bg/fg
 		img_gray_bg.convertTo(img_1Cdummy,CV_8UC1);
 		absdiff(img_1Cdummy,img_gray,img_gray_fg);
 		threshold(img_gray_fg,img_gray_fg,GRAY_THRESH_DIFF,255,THRESH_BINARY);
 		imshow("GRAY FG",img_gray_fg);
 		if (mcnt<mstart)
 		{
-			accumulateWeighted(img_gray,img_gray_bg,GRAY_ALPHA_UPDATE);///////<========
+			accumulateWeighted(img_gray,img_gray_bg,GRAY_ALPHA_UPDATE);///////<========Learn bg without mask
 			mcnt++;
 		}
-		else accumulateWeighted(img_gray,img_gray_bg,GRAY_ALPHA_UPDATE,weight_mask);///////<========
+		else accumulateWeighted(img_gray,img_gray_bg,GRAY_ALPHA_UPDATE,weight_mask);///////<========Mask bg subtraction
 		img_gray_bg.convertTo(img_1Cdummy,CV_8UC1);
 		imshow("GRAY BG",img_1Cdummy);
 
 
-
+		//get canny, canny bg/fg
 		Canny(img_gray,img_canny,canny_l, canny_h);
 		imshow("Canny",img_canny);
 
 		img_canny_bg.convertTo(img_1Cdummy,CV_8UC1);
 		absdiff(img_1Cdummy,img_canny,img_canny_fg);
 		threshold(img_canny_fg,img_canny_fg,CANNY_THRESH_DIFF,255,THRESH_BINARY);
-		///
+		///reduce noise
 		erode( img_canny_fg, img_canny_fg, MORPH_CROSS );
 		dilate( img_canny_fg, img_canny_fg, MORPH_CROSS );
 		///
@@ -208,14 +218,14 @@ int mainOFF (){
 
 		if (mcnt<mstart)
 		{
-			accumulateWeighted(img_canny,img_canny_bg,CANNY_ALPHA_UPDATE);///////<=======
+			accumulateWeighted(img_canny,img_canny_bg,CANNY_ALPHA_UPDATE);///////<=======Learn bg without mask
 		}
-		else accumulateWeighted(img_canny,img_canny_bg,CANNY_ALPHA_UPDATE,weight_mask);///////<=======
+		else accumulateWeighted(img_canny,img_canny_bg,CANNY_ALPHA_UPDATE,weight_mask);///////<=======Mask bg subtraction
 		
 		img_canny_bg.convertTo(img_1Cdummy,CV_8UC1);
 		imshow("Canny BG",img_1Cdummy);
 
-
+		//get color bg/fg, difference and mix
 		absdiff(img_gray,img_gray_buffer,img_gray_diff);
 		threshold(img_gray_diff,img_gray_diff,GRAY_DIFF_THRESH_DIFF,255,THRESH_BINARY);
 		imshow("Gray Diff",img_gray_diff);
@@ -238,7 +248,7 @@ int mainOFF (){
 		img_3Cdummy=25;
 		img_src.copyTo(img_3Cdummy,img_gray_fg);
 		imshow("Mask",img_3Cdummy);
-	
+		//find and filter blobs, prepare final mask
 		vector<vector<Point> > contours;
 		vector<Vec4i> hierarchy;
 		int minsize = MIN_BLOB_SIZE;

@@ -1,3 +1,6 @@
+/*Small test program to validate calibration. Find object by color (hsv calibration by user) 
+*and print blue circle around it.
+*/
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -40,8 +43,9 @@ void on_V_trackbar( int, void* )
 	v=v_slider;
 }
 
-int main()
+int main()//set to main
 {
+	//load calibration matrix
 	const string inputSettingsFile = "projector_calib.yml";
     FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings
 	if (!fs.isOpened())
@@ -52,15 +56,14 @@ int main()
 	Mat rotationMatrix;
 	fs["projector_correction"]>>rotationMatrix;
 	fs.release();
+	//initialize camera
 	VideoCapture videocap;
 	videocap.open(VIDEOPATH);
-
 	if( !videocap.isOpened() )
     {
         puts("***Could not initialize capturing...***\n");
         return 0;
     }
-
 	Mat frame;
 	for(int i =0;i<10;i++)
 	{
@@ -72,6 +75,7 @@ int main()
         puts("***Could not read from capture...***\n");
         return 0;
     }
+	//set vars, trackbars, windows
 	bool loop=true;
 	cvNamedWindow("View", CV_WINDOW_NORMAL);
 	cvNamedWindow("Final", CV_WINDOW_NORMAL);
@@ -79,39 +83,26 @@ int main()
 	createTrackbar("Hue","View",&h_slider,maxVal,on_H_trackbar);
 	createTrackbar("Sat","View",&s_slider,maxVal,on_S_trackbar);
 	createTrackbar("Val","View",&v_slider,maxVal,on_V_trackbar);
+	//main loop
 	while(loop)
 	{
+		//read frame from camera
 		videocap>>frame;
+		//hsv threshold and noise removal
 		Mat hsv,thresh;
 		cvtColor(frame,hsv,CV_BGR2HSV);
 		GaussianBlur(hsv,hsv,Size(3,3),1);
 		inRange(hsv,Scalar(h,s,v),Scalar(maxVal,maxVal,maxVal),thresh);
-
 		erode(thresh,thresh,getStructuringElement(MORPH_RECT, Size(5, 5)) );
 		dilate(thresh,thresh,getStructuringElement(MORPH_RECT, Size(5, 5)) );
-
+		//find contours
 		vector<vector<Point> > contours;
 		vector<Vec4i> hierarchy;
 		int largest_area = -1;
 		int index = -1;
 		Mat thresh2=thresh.clone();
 		findContours( thresh2, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-		//for( int i = 0; i< contours.size(); i++ ) // iterate through each contour. 
-		//{
-		//	double a=contourArea( contours[i],false);  //  Find the area of contour
-		//	if(a>largest_area)
-		//	{
-		//		largest_area=a;
-		//		index=i;                //Store the index of largest contour
-		//	}   
-		//}
-		//Moments mu = moments( contours[index], false );
-		//Point2f mc = Point2f( mu.m10/mu.m00 , mu.m01/mu.m00 );
-		//Mat fin(Size(1400,1050),CV_8UC3);
-		//circle(fin,mc,50,Scalar(255,0,0),-1);
-		//warpPerspective(fin,fin,rotationMatrix,fin.size());
-
+		//Prepare final projection image
 		Mat fin(Size(1400,1050),CV_8UC3);
 		// Get the moments
 		vector<Moments> mu(contours.size());
@@ -119,21 +110,21 @@ int main()
 		{ 
 			mu[i] = moments( contours[i], false );
 		}
-
-		///  Get the mass centers:
+		// Get the mass centers:
 		vector<Point2f> mc( contours.size() );
 		for( int i = 0; i < contours.size(); i++ )
 		{ 
 			mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); 
 		}
-		//draw
+		//draw circles
 		for( int i = 0; i < contours.size(); i++ )
 		{ 
 			circle(fin,mc[i],40,Scalar(255,0,0),2);
 		}
-		warpPerspective(fin,fin,rotationMatrix,fin.size());
-		//warpPerspective(thresh,fin,rotationMatrix,fin.size());
-		//thresh.copyTo(fin);
+		//calibrate image for projection
+		warpPerspective(fin,fin,rotationMatrix,fin.size());//show circles
+		//warpPerspective(thresh,fin,rotationMatrix,fin.size());//show hsv threshold overlay
+		//thresh.copyTo(fin);//show decalibrated threshold overlay
 		
 		imshow("Final",fin);
 		imshow("Result",thresh);
