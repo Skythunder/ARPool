@@ -43,7 +43,7 @@ void on_V_trackbar( int, void* )
 	v=v_slider;
 }
 
-int main()//set to main
+int mainOFF()//set to main
 {
 	//load calibration matrix
 	const string inputSettingsFile = "projector_calib.yml";

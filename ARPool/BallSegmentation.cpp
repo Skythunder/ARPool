@@ -1,6 +1,7 @@
 /*Normal (RGB) camera Ball segmentation. Will require infrared camera or filter 
 *to work with projected effects. Blob centroid calculation pending.
 */
+#pragma comment(lib, "Ws2_32.lib")
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/video/background_segm.hpp"
@@ -9,6 +10,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <time.h>
+#include <winsock2.h>
 
 using namespace std;
 using namespace cv;
@@ -21,6 +23,10 @@ using namespace cv;
 
 //set repeat
 #define REPEATVIDEO 1
+
+//server info
+#define SERVER_ADDR "127.0.0.1"
+#define SERVER_PORT 7777
 
 //parameter definition
 #define CANNY_L 100
@@ -37,6 +43,7 @@ using namespace cv;
 #define OPT_WINDOW_WIDTH 320
 
 #define MIN_BLOB_SIZE 10
+#define MIN_BLOB_AREA 20
 #define MIN_PERCENT_MASK 0.05
 #define MASK_START 1500;
 
@@ -93,7 +100,7 @@ int MixImgs(			cv::Mat *p_mat_in1,
 }
 
 
-int mainOFF (){//set to main
+int main(){//set to main
 	//initialize camera
 	VideoCapture videocap;
 	videocap.open(VIDEOPATH);
@@ -159,6 +166,38 @@ int mainOFF (){//set to main
 	////////////////////////////////////
 	int mcnt = 0;
 	int mstart = MASK_START;
+
+	//create socket
+	int fd;
+	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
+	{ 
+		cout<<"Cannot create socket"<<endl;
+		return -1;
+	}
+	struct sockaddr_in myaddr;
+	memset((char *)&myaddr, 0, sizeof(myaddr)); 
+	myaddr.sin_family = AF_INET; 
+	myaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+	myaddr.sin_port = htons(0);
+	if (bind(fd, (struct sockaddr *)&myaddr, sizeof(myaddr)) < 0) 
+	{ 
+		perror("bind failed"); 
+		return 0; 
+	}
+	struct sockaddr_in servaddr; 
+	memset((char*)&servaddr, 0, sizeof(servaddr)); 
+	servaddr.sin_family = AF_INET; 
+	servaddr.sin_port = htons(SERVER_PORT);
+	struct hostent *hp; 
+	char *host = SERVER_ADDR;
+	hp = gethostbyname(host); 
+	if (!hp) 
+	{ 
+		fprintf(stderr, "could not obtain address of %s\n", host); 
+		return -1; 
+	} 
+	memcpy((void *)&servaddr.sin_addr, hp->h_addr_list[0], hp->h_length);
+
 	//main loop
 	while(1){
 		//read frame
@@ -252,7 +291,9 @@ int mainOFF (){//set to main
 		vector<vector<Point> > contours;
 		vector<Vec4i> hierarchy;
 		int minsize = MIN_BLOB_SIZE;
+		int minarea = MIN_BLOB_AREA;
 		double percent=MIN_PERCENT_MASK;
+		vector<Moments> mu;
 		Mat cleanMask = Mat::zeros(img_gray_fg.size(),CV_8UC1);
 		findContours(img_gray_fg,contours,hierarchy,CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 		for( int i = 0; i< contours.size(); i++ )
@@ -261,17 +302,44 @@ int mainOFF (){//set to main
 			Mat aux = Mat::zeros(img_gray_fg.size(),CV_8UC1);
 			if(contours[i].size()>minsize)
 			{
-				drawContours( aux, contours, i, color, 3, 8, hierarchy, 0, Point());
-				int nzt = countNonZero(aux);
-				bitwise_and(img_canny_fg,aux,aux);
-				int nz=countNonZero(aux);
-				double per = nz/double(nzt);
-				if(per>percent)
+				if(contourArea(contours[i],false)>minarea)
 				{
-					drawContours( cleanMask, contours, i, color, -1, 8, hierarchy, 0, Point());
+					drawContours( aux, contours, i, color, 3, 8, hierarchy, 0, Point());
+					int nzt = countNonZero(aux);
+					bitwise_and(img_canny_fg,aux,aux);
+					int nz=countNonZero(aux);
+					double per = nz/double(nzt);
+					if(per>percent)
+					{
+						drawContours( cleanMask, contours, i, color, -1, 8, hierarchy, 0, Point());
+						mu.push_back(moments( contours[i], false ));
+					}
 				}
 			}
 		}
+		///  Get the mass centers:
+		vector<float> mc( mu.size()*2 );
+		int j=0;
+		for( int i = 0; i < mu.size()*2; i+=2 )
+		{ 
+			mc[i] = mu[j].m10/mu[j].m00; 
+			mc[i+1] = mu[j].m01/mu[j].m00; 
+			j++;
+		}
+		
+		const float *p_floats = &(mc[0]);
+		const char *p_bytes = reinterpret_cast<const char *>(p_floats);
+		vector<const char>tosend(p_bytes, p_bytes + sizeof(float) * mc.size());
+		//sendto(fd, reinterpret_cast<const char*>(tosend.data()), sizeof(tosend.data()), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+		sendto(fd, p_bytes, sizeof(float) * mc.size(), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
+		//draw
+		Mat cntr=Mat::zeros(img_gray_fg.size(),CV_8UC1);
+		for( int i = 0; i < mc.size(); i+=2 )
+		{ 
+			circle(cntr,Point(mc[i],mc[i+1]),10,Scalar(255,0,0),-1);
+		}
+		imshow("Centroids",cntr);
 		if(mcnt>=mstart) 
 		{
 			weight_mask=cleanMask.clone();
