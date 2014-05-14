@@ -39,14 +39,28 @@ public class SocketCom : MonoBehaviour {
 		int j=0;
 		for(int i=0;i<floatArr.Length;i+=2)
 		{
-			Vector3 wp = new Vector3(floatArr[i],0,floatArr[i+1]);
-			GameObject go = GameObject.Find(wp.ToString());
+			Vector3 wp = new Vector3(floatArr[i],0f,floatArr[i+1]);
+			GameObject go; 
+			go = GameObject.Find(wp.ToString());
 			if(!go)
 			{
 				if(j<particles.Length)
 				{
 					go=(GameObject)particles[j];
 					go.transform.position=wp;
+					/*float dist = Mathf.Infinity;
+					int pos=-1;
+					for(int x=0;x<particles.Length;x++)
+					{
+						float dif=(particles[x].transform.position-wp).sqrMagnitude;
+						if(dif<dist)
+						{
+							dist=dif;
+							pos=x;
+						}
+					}
+					go=(GameObject)particles[pos];
+					go.transform.position=wp;*/
 				}
 				else
 				{
