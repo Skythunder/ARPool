@@ -1,0 +1,54 @@
+using UnityEngine;
+using System.Collections;
+using System;
+using System.Net;
+using System.Net.Sockets;
+
+public class MaskCalib : MonoBehaviour {
+	public int PORT = 7777;
+	public int irows = 180;
+	public int icols = 240;
+	public GameObject wall;
+	public UdpClient sock;
+	public IPEndPoint groupEP;
+	private Texture2D tex;
+	public GUIText tt;
+	public Shader[] sl;
+	
+	// Use this for initialization
+	void Start () {
+		sock = new UdpClient(PORT);
+		groupEP = new IPEndPoint(IPAddress.Any, PORT);
+		tex = new Texture2D(icols,irows,TextureFormat.ARGB32, false);
+		Shader sh = Shader.Find("Unlit/Texture");
+		wall.renderer.material.shader=sh;
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		byte[] rec;
+		rec=sock.Receive(ref groupEP);
+		uint pos = 0;
+		for(int i=0;i<irows;i++)
+		{
+			for(int j=0;j<icols;j++)
+			{
+				uint b=(uint)rec[pos];
+				if(b==0)
+					tex.SetPixel(j,i,Color.black);
+				else
+					tex.SetPixel(j,i,Color.white);
+				pos++;
+			}
+		}
+		tex.Apply();
+		wall.renderer.material.mainTexture=tex;
+		wall.renderer.material.mainTextureScale = new Vector2 (-1, 1);
+		tt.text=rec.Length.ToString();
+	
+	}
+	
+	void onAplicationQuit(){
+		sock.Close();
+	}
+}

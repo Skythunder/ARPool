@@ -19,6 +19,7 @@ using namespace cv;
 //#define VIDEOPATH "vid1.mp4"
 //#define VIDEOPATH "vid2.mp4"
 #define VIDEOPATH "pool.avi"
+//#define VIDEOPATH 0
 //#define VIDEOPATH "The Rocket Quickfire.mp4"
 
 //set repeat
@@ -46,6 +47,8 @@ using namespace cv;
 #define MIN_BLOB_AREA 20
 #define MIN_PERCENT_MASK 0.05
 #define MASK_START 1500;
+
+#define PROJECTOR_RESOLUTION Size(1400,1050)
 
 //mix images
 int MixImgs(			cv::Mat *p_mat_in1,
@@ -100,7 +103,8 @@ int MixImgs(			cv::Mat *p_mat_in1,
 }
 
 
-int main(){//set to main
+int mainOFFM(){//set to main
+	bool send_centroids=false;
 	//initialize camera
 	VideoCapture videocap;
 	videocap.open(VIDEOPATH);
@@ -111,12 +115,30 @@ int main(){//set to main
         return 0;
     }
 	
+	//load calibration matrix
+	const string inputSettingsFile = "projector_calib.yml";
+    FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings
+	if (!fs.isOpened())
+    {
+        cout << "Could not open the calibration data file: \"" << inputSettingsFile << "\"" << endl;
+        return -1;
+    }
+	Mat rotationMatrix;
+	fs["projector_correction"]>>rotationMatrix;
+	fs.release();
+
 	Mat img_src;
 	Mat img_frame;
 
 	videocap >> img_frame;
+	for(int i;i<20;i++)
+	{
+		if(!img_frame.empty())
+			break;
+		videocap >> img_frame;
+	}
 	if(img_frame.empty())
-			return 0;
+		return 0;
 	//resize image to improve speed
 	int imgW = img_frame.cols;
 	float rel = 1;
@@ -327,11 +349,15 @@ int main(){//set to main
 			j++;
 		}
 		
-		const float *p_floats = &(mc[0]);
-		const char *p_bytes = reinterpret_cast<const char *>(p_floats);
-		vector<const char>tosend(p_bytes, p_bytes + sizeof(float) * mc.size());
-		//sendto(fd, reinterpret_cast<const char*>(tosend.data()), sizeof(tosend.data()), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
-		sendto(fd, p_bytes, sizeof(float) * mc.size(), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+		if(send_centroids)
+		{
+			//Send centroids over socket
+			const float *p_floats = &(mc[0]);
+			const char *p_bytes = reinterpret_cast<const char *>(p_floats);
+			vector<const char>tosend(p_bytes, p_bytes + sizeof(float) * mc.size());
+			//sendto(fd, reinterpret_cast<const char*>(tosend.data()), sizeof(tosend.data()), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+			sendto(fd, p_bytes, sizeof(float) * mc.size(), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+		}
 
 		//draw
 		Mat cntr=Mat::zeros(img_gray_fg.size(),CV_8UC1);
@@ -345,7 +371,7 @@ int main(){//set to main
 			weight_mask=cleanMask.clone();
 			bitwise_not(weight_mask,weight_mask);
 			weight_mask.convertTo(weight_mask,CV_8U);
-			img_src.copyTo(cleanMask,cleanMask);
+			//img_src.copyTo(cleanMask,cleanMask);//create color mask
 			imshow("Final",cleanMask);
 		}
 		else 
@@ -354,9 +380,27 @@ int main(){//set to main
 			cout<<mcnt<<endl;
 		}
 
-		if(waitKey(1) == 27)
+		//sendmask over socket
+		if(!send_centroids)
+		{
+			if(mcnt>=mstart)
+			{
+				Mat msend = cleanMask.clone();
+				//resize(msend,msend,PROJECTOR_RESOLUTION);
+				//warpPerspective(msend,msend,rotationMatrix,msend.size());
+				msend=msend.reshape(0,1);
+				int imgsize = msend.total()*msend.elemSize();
+				const char *p_bytes = reinterpret_cast<const char *>(msend.data);
+				sendto(fd, p_bytes, imgsize, 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
+			}
+		}
+		
+		char key = waitKey(1);
+		if(key=='c'||key=='C')
+			send_centroids=!send_centroids;
+		if(key == 27)
 			break;
-
+		
 	}
 
 	return 0;

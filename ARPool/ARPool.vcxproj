@@ -57,25 +57,28 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>D:\Libraries\opencv247\build\include;C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\package_bgs;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\opencv247\build\include;C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\package_bgs;$(OPENNI2_INCLUDE)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>D:\Libraries\opencv247\build\x86\vc11\lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_core247.lib;opencv_imgproc247.lib;opencv_highgui247.lib;opencv_ml247.lib;opencv_video247.lib;opencv_features2d247.lib;opencv_calib3d247.lib;opencv_objdetect247.lib;opencv_contrib247.lib;opencv_legacy247.lib;opencv_flann247.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Libraries\opencv247\build\x86\vc11\lib;$(OPENNI2_LIB)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_core247.lib;opencv_imgproc247.lib;opencv_highgui247.lib;opencv_ml247.lib;opencv_video247.lib;opencv_features2d247.lib;opencv_calib3d247.lib;opencv_objdetect247.lib;opencv_contrib247.lib;opencv_legacy247.lib;opencv_flann247.lib;openNI2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BallSegmentation.cpp" />
     <ClCompile Include="camera_calibration.cpp" />
+    <ClCompile Include="KinectSeg.cpp" />
     <ClCompile Include="package_bgs\dp\DPZivkovicAGMMBGS.cpp" />
     <ClCompile Include="package_bgs\dp\Image.cpp" />
     <ClCompile Include="package_bgs\dp\ZivkovicAGMM.cpp" />
     <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp" />
     <ClCompile Include="ProjectionTest.cpp" />
     <ClCompile Include="projector_calibration.cpp" />
+    <ClCompile Include="unity_projector_calib.cpp" />
+    <ClCompile Include="unity_proj_maskCalib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif" />

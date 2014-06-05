@@ -44,14 +44,26 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\MovingFlame.cs" />
-     <Compile Include="Assets\Obscure.cs" />
-     <Compile Include="Assets\SocketCom.cs" />
+     <Compile Include="Assets\Scripts\Calib.cs" />
+     <Compile Include="Assets\Scripts\DontStop.cs" />
+     <Compile Include="Assets\Scripts\MaskCalib.cs" />
+     <Compile Include="Assets\Scripts\MaskRecSock.cs" />
+     <Compile Include="Assets\Scripts\MovingFlame.cs" />
+     <Compile Include="Assets\Scripts\Obscure.cs" />
+     <Compile Include="Assets\Scripts\SocketCom.cs" />
+     <Compile Include="Assets\Scripts\Temp.cs" />
+     <Compile Include="Assets\Scripts\rippleSharp.cs" />
+     <Compile Include="Assets\Scripts\test.cs" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
-     <None Include="Assets\Hole.shader" />
+     <None Include="Assets\Standard Assets\Water (Basic)\Sources\Shaders\FX-Water Simple.shader" />
+     <None Include="Assets\Shaders\Hole.shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass-vs.csproj">
+      <Project>{A7919DFA-2449-427F-590D-1072C1A2667E}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
