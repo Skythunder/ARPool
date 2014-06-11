@@ -196,7 +196,7 @@ int mainPT()//set to main
 			const char *p_bytes = reinterpret_cast<const char *>(p_floats);
 			vector<const char>tosend(p_bytes, p_bytes + sizeof(float) * mcf.size());
 			int ccc=sendto(fd, p_bytes, sizeof(float) * mcf.size(), 0, (struct sockaddr *)&servaddr, sizeof(servaddr));
-			cout<<ccc<<endl;
+			//cout<<ccc<<endl;
 		}
 		if(!send_centroids)
 		{
