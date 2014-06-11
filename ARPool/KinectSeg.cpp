@@ -279,6 +279,7 @@ int main(){
 		{
 			Mat msend(IMAGE_SIZE,CV_8UC1);
 			warpPerspective(image,msend,maskMatrix,msend.size());
+			flip(msend,msend,0);
 			/*Mat aux(Size(240,240),CV_8UC1);
 			resize(image,aux,aux.size());
 			Mat msend=aux.clone();

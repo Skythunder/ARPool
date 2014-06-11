@@ -70,6 +70,7 @@
   <ItemGroup>
     <ClCompile Include="BallSegmentation.cpp" />
     <ClCompile Include="camera_calibration.cpp" />
+    <ClCompile Include="KinectCalib.cpp" />
     <ClCompile Include="KinectSeg.cpp" />
     <ClCompile Include="package_bgs\dp\DPZivkovicAGMMBGS.cpp" />
     <ClCompile Include="package_bgs\dp\Image.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="projector_calibration.cpp" />
     <ClCompile Include="unity_projector_calib.cpp" />
     <ClCompile Include="unity_proj_maskCalib.cpp" />
+    <ClCompile Include="UPKinectCalib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif" />

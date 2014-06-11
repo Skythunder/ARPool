@@ -2,6 +2,7 @@
 *print "pattern.png" and use for calibration
 * Many changes pending...
 */
+#define NOMINMAX
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -11,6 +12,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <OpenNI.h>
 
 #ifndef _CRT_SECURE_NO_WARNINGS
 # define _CRT_SECURE_NO_WARNINGS
@@ -19,6 +21,8 @@
 using namespace cv;
 using namespace std;
 
+namespace kcalib{
+using namespace kcalib;
 static void help()
 {
     cout <<  "This is a camera calibration sample." << endl
@@ -227,7 +231,7 @@ enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
 bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat& distCoeffs,
                            vector<vector<Point2f> > imagePoints );
 
-int mainCC()//set to main
+int main()//set to main
 {
     help();
     Settings s;
@@ -246,6 +250,62 @@ int mainCC()//set to main
         cout << "Invalid input detected. Application stopping. " << endl;
         return -1;
     }
+	int fps=30;
+	int resX=640;
+	int resY=480;
+	openni::Device device;
+	openni::VideoStream video_depth, video_color;
+	openni::VideoStream** video_stream_depth, **video_stream_color;
+	// Inicialização _____
+	if (!openni::OpenNI::initialize())
+	{
+		device.open(openni::ANY_DEVICE);
+		if (device.isValid())
+		{
+			video_stream_depth = new openni::VideoStream*();
+			video_stream_depth[0] = &video_depth;
+			video_stream_color = new openni::VideoStream*();
+			video_stream_color[0] = &video_color;
+
+			device.setDepthColorSyncEnabled(true);
+		}
+	}
+	// START WEBCAM _
+	openni::VideoMode videoMode;
+	// DEPTH
+	if (!video_depth.isValid())
+	{
+		video_depth.create(device, openni::SENSOR_DEPTH);
+		if (video_depth.isValid())
+		{
+			videoMode = video_depth.getVideoMode();
+			videoMode.setFps(fps);
+			videoMode.setResolution(resX, resY);
+			video_depth.setVideoMode(videoMode);
+        
+			video_depth.start();
+		}
+	}
+	// COLOR:
+	if (!video_color.isValid())
+	{
+		video_color.create(device, openni::SENSOR_COLOR);
+		 if (video_color.isValid())
+		{
+			videoMode = video_color.getVideoMode();
+			videoMode.setFps(fps);
+			videoMode.setResolution(resX, resY);
+			video_color.setVideoMode(videoMode);
+         
+			video_color.start();
+		}
+	}
+	
+	device.isImageRegistrationModeSupported(openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+	device.setImageRegistrationMode(openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR );
+	// CAPTURE WEBCAM _
+	openni::VideoFrameRef videoDepthFrame, videoColorFrame;
+
 
     vector<vector<Point2f> > imagePoints;
     Mat cameraMatrix, distCoeffs;
@@ -260,7 +320,19 @@ int mainCC()//set to main
       Mat view;
       bool blinkOutput = false;
 
-      view = s.nextImage();
+      //view = s.nextImage();
+	  if (video_color.isValid())
+		{
+			if (!video_color.readFrame(&videoColorFrame))
+			{
+				const openni::RGB888Pixel* imageBuffer = (const openni::RGB888Pixel*)videoColorFrame.getData();
+				view.create(videoColorFrame.getHeight(), videoColorFrame.getWidth(), CV_8UC3);
+				memcpy( view.data, imageBuffer, 3*videoColorFrame.getHeight()*videoColorFrame.getWidth()*sizeof(uint8_t) );
+
+				cvtColor(view,view,CV_RGB2BGR);
+				//emit webcam_display(WEBCAM::COLOR, image);
+			}
+		}
 
       //-----  If no more image, or got enough, then stop calibration and show result -------------
       if( mode == CAPTURING && imagePoints.size() >= (unsigned)s.nrFrames )
@@ -567,4 +639,10 @@ bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat&
         saveCameraParams( s, imageSize, cameraMatrix, distCoeffs, rvecs ,tvecs, reprojErrs,
                             imagePoints, totalAvgErr);
     return ok;
+}
+}
+int mainKC()
+{
+	kcalib::main();
+	return 0;
 }

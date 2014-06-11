@@ -22,7 +22,7 @@ using namespace std;
 #define VIDEOPATH 0
 #define PROJECTOR_RESOLUTION Size(1400,1050)
 
-int mainOFFUPC()//set to main
+int mainUPC()//set to main
 {
 	//Loading camera calibration data
 	const string inputSettingsFile = "out_camera_data.xml";
