@@ -36,7 +36,14 @@ void calculateHistogram(float* pHistogram, int histogramSize, const openni::Vide
             pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
  }
 
+void on_trackbar(int, void*){}
+int threshNear = 60;
+int threshFar = 100;
+
 int main(){
+	namedWindow("DEPTH",1);
+	createTrackbar( "threshold near", "DEPTH", &threshNear,255, on_trackbar );
+    createTrackbar( "threshold far", "DEPTH", &threshFar,255, on_trackbar );
 	// Inicialização _____
 	if (!openni::OpenNI::initialize())
 	{
@@ -103,30 +110,17 @@ int main(){
 				//cout<<"OK!"<<endl;
 				calculateHistogram(depth_histogram, 10000, videoDepthFrame);
 
-				vector<uchar> pontos;
-				unsigned short* xxx = (unsigned short*)videoDepthFrame.getData();
-				for(int i = 0;i<videoDepthFrame.getDataSize();i++)
-				{
-					pontos.push_back((uchar)xxx);
-					xxx++;
-				}
-				for(int i = 0;i<pontos.size();i++)
-				{
-					if(pontos[i]<50||pontos[i]>100)
-						pontos[i]=255;
-					else pontos[i]=0;
-				}
-				//Mat aux(videoDepthFrame.getHeight(), videoDepthFrame.getWidth(), CV_16U,(unsigned short*)videoDepthFrame.getData());
-				Mat aux(videoDepthFrame.getHeight(), videoDepthFrame.getWidth(), CV_16U);
-				int z=0;
-				for(int i = 0;i<videoDepthFrame.getWidth();i++)
-				{
-					for(int j = 0;j<videoDepthFrame.getHeight();j++)
-					{
-						aux.at<int>(i,j)=pontos[z];
-						z++;
-					}
-				}
+				Mat aux(videoDepthFrame.getHeight(), videoDepthFrame.getWidth(), CV_16U,(unsigned short*)videoDepthFrame.getData());
+
+				const float scaleFactor = 0.05f;
+				Mat show,dnear,dfar;
+				aux.convertTo( show, CV_8UC1, scaleFactor );
+				show.copyTo(dnear);
+				show.copyTo(dfar);
+				threshold(dnear,dnear,threshNear,255,CV_THRESH_TOZERO);
+                threshold(dfar,dfar,threshFar,255,CV_THRESH_TOZERO_INV);
+				show = dnear & dfar;
+				imshow("DEPTH",show);
 				image=aux;
 				//Mat image(videoDepthFrame.getWidth(), videoDepthFrame.getHeight(), CV_16U);
 				const openni::DepthPixel *ptr = (const openni::DepthPixel *) videoDepthFrame.getData();
@@ -171,7 +165,7 @@ int main(){
 		medianBlur(img_thresh, img_thresh, 5);
 
 
-		imshow("DEPTH",img_thresh);
+		//imshow("DEPTH",img_thresh);
 		imshow("COLOR",image2);
 		if(waitKey(30)==27) break;
 	}
@@ -182,17 +176,18 @@ int main(){
 		video_depth.stop();
 		video_depth.destroy();
 	}
-
 	if (video_color.isValid())
 	 {
 		video_color.stop();
 		video_color.destroy();
 	}
 	// _______________________
-
 	delete video_stream_depth;
 	delete video_stream_color;
-	device.close();
+	cout<<"CLOSING DEVICE!"<<endl;
+	//device.close();
+	cout<<"SHUTING DOWN OPENNI!"<<endl;
 	//nite::NiTE::shutdown();
-	openni::OpenNI::shutdown();
+	//openni::OpenNI::shutdown();
+	cout<<"OK!"<<endl;
 }
