@@ -3,6 +3,7 @@ using System.Collections;
 
 public class rippleSharp : MonoBehaviour {
 
+
 private int[] buffer1;
 private int[] buffer2;
 private int[] vertexIndices;
@@ -56,6 +57,7 @@ void Start () {
 		vertexIndices[(int)position] = i;	
 	}
 	splashAtPoint(cols/2,rows/2);
+	
 }
 
 

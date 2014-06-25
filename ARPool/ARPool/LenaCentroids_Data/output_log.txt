@@ -17,7 +17,7 @@ Platform assembly: C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPo
 Loading C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\ARPool\LenaCentroids_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
 Platform assembly: C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\ARPool\LenaCentroids_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
 Loading C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\ARPool\LenaCentroids_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
-- Completed reload, in  0.622 seconds
+- Completed reload, in  0.363 seconds
 desktop: 1400x1050 60Hz; virtual: 2766x1050 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.

@@ -57,6 +57,9 @@
     <ClCompile Include="UPKinectCalib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RGBSegmentation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="01_test.tif">

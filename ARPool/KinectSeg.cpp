@@ -23,27 +23,6 @@ int resY=480;
 openni::Device device;
 openni::VideoStream video_depth, video_color;
 openni::VideoStream** video_stream_depth, **video_stream_color;
-    
-void calculateHistogram(float* pHistogram, int histogramSize, const openni::VideoFrameRef& frame)
- {
-    const openni::DepthPixel* pDepth = (const openni::DepthPixel*)frame.getData();
-    // Calculate the accumulative histogram (the yellow display...)
-    memset(pHistogram, 0, histogramSize*sizeof(float));
-     int restOfRow = frame.getStrideInBytes() / sizeof(openni::DepthPixel) - frame.getWidth();
-    int height = frame.getHeight(); int width = frame.getWidth();
-    unsigned int nNumberOfPoints = 0;
-    for (int y = 0; y < height; ++y)
-     {
-        for (int x = 0; x < width; ++x, ++pDepth)
-            if (*pDepth != 0) { pHistogram[*pDepth]++; nNumberOfPoints++; }
-        pDepth += restOfRow;
-    }
-    for (int nIndex=1; nIndex<histogramSize; nIndex++)
-         pHistogram[nIndex] += pHistogram[nIndex-1];
-    if (nNumberOfPoints)
-        for (int nIndex=1; nIndex<histogramSize; nIndex++)
-            pHistogram[nIndex] = (256 * (1.0f - (pHistogram[nIndex] / nNumberOfPoints)));
- }
 
 void on_trackbar(int, void*){}
 int threshNear = 112;
@@ -55,10 +34,10 @@ int blurPre = 1;
 
 int main(){
 	namedWindow("DEPTH",WINDOW_NORMAL);
-	createTrackbar( "threshold near", "DEPTH", &threshNear,255, on_trackbar );
-    createTrackbar( "threshold far", "DEPTH", &threshFar,255, on_trackbar );
-	createTrackbar( "amount dilate", "DEPTH", &dilateAmt,16, on_trackbar );
-    createTrackbar( "amount erode", "DEPTH", &erodeAmt,16, on_trackbar );
+	createTrackbar( "threshold near", "DEPTH", &threshNear,4000, on_trackbar );
+    createTrackbar( "threshold far", "DEPTH", &threshFar,4000, on_trackbar );
+	createTrackbar( "amount dilate", "DEPTH", &dilateAmt,40, on_trackbar );
+    createTrackbar( "amount erode", "DEPTH", &erodeAmt,40, on_trackbar );
     createTrackbar( "amount blur", "DEPTH", &blurAmt,16, on_trackbar );
     createTrackbar( "blur pre", "DEPTH", &blurPre,1, on_trackbar );
 	bool centroid_mode=false;
@@ -183,18 +162,41 @@ int main(){
 			{
 				float depth_histogram[10000];
 				//cout<<"OK!"<<endl;
-				calculateHistogram(depth_histogram, 10000, videoDepthFrame);
 
 				Mat aux(videoDepthFrame.getHeight(), videoDepthFrame.getWidth(), CV_16U,(unsigned short*)videoDepthFrame.getData());
 				//CONVERT AND FILTER DEPTH IMAGE
-				const float scaleFactor = 0.05f;
+				/*const float scaleFactor = 0.05f;
 				Mat show,dnear,dfar;
 				aux.convertTo( show, CV_8UC1, scaleFactor );
 				show.copyTo(dnear);
 				show.copyTo(dfar);
 				threshold(dnear,dnear,threshNear,255,CV_THRESH_TOZERO);
                 threshold(dfar,dfar,threshFar,255,CV_THRESH_TOZERO_INV);
-				show = dnear & dfar;
+				show = dnear & dfar;*/
+				Mat show;
+				show=aux.clone();
+				int channels = show.channels();
+
+				int nRows = show.rows;
+				int nCols = show.cols * channels;
+
+				if (show.isContinuous())
+				{
+					nCols *= nRows;
+					nRows = 1;
+				}
+				for(int row = 0; row < nRows; ++row) 
+				{
+					unsigned short* p = show.ptr<unsigned short>(row);
+					for(int col = 0; col < nCols; ++col) 
+					{
+						if(p[col]>threshNear&&p[col]<threshFar)
+							p[col]=255;
+						else
+							p[col]=0;
+					}
+				}
+				show.convertTo( show, CV_8UC1);
 				//PROCESS CONTOURS
 				if(blurPre == 1) blur(show,show,Size(blurAmt+1,blurAmt+1));
                 Mat cntr; show.copyTo(cntr);

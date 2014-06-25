@@ -78,6 +78,7 @@
     <ClCompile Include="package_bgs\StaticFrameDifferenceBGS.cpp" />
     <ClCompile Include="ProjectionTest.cpp" />
     <ClCompile Include="projector_calibration.cpp" />
+    <ClCompile Include="RGBSegmentation.cpp" />
     <ClCompile Include="unity_projector_calib.cpp" />
     <ClCompile Include="unity_proj_maskCalib.cpp" />
     <ClCompile Include="UPKinectCalib.cpp" />

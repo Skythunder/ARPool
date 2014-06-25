@@ -17,7 +17,7 @@ Platform assembly: C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPo
 Loading C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\ARPool\CalibMask_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
 Platform assembly: C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\ARPool\CalibMask_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
 Loading C:\Users\JR\Documents\Visual Studio 2012\Projects\ARPool\ARPool\ARPool\CalibMask_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
-- Completed reload, in  0.486 seconds
+- Completed reload, in  1.109 seconds
 desktop: 1400x1050 60Hz; virtual: 2766x1050 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.

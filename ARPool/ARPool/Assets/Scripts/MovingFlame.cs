@@ -43,6 +43,7 @@ public class MovingFlame : MonoBehaviour {
 			if(!go)
 			{
 				go=(GameObject)Instantiate(flame,wp,Quaternion.identity);
+				go.transform.Rotate(new Vector3(270,0,0));
 			}
 			temp.Add(go);
 			go.name=wp.ToString();

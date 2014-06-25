@@ -5,9 +5,9 @@ using System.Net;
 using System.Net.Sockets;
 
 public class Temp : MonoBehaviour {
-	public const int PORT = 7777;
-	public const int irows = 178;
-	public const int icols = 320;
+	public int PORT = 7777;
+	public int irows = 178;
+	public int icols = 320;
 	public GameObject wall;
 	public float t=1f;
 	public UdpClient sock;
@@ -30,7 +30,8 @@ public class Temp : MonoBehaviour {
 		tex.Apply();
 		wall.renderer.material.mainTexture=tex;
 		wall.renderer.material.mainTextureScale = new Vector2 (-1, 1);
-		Shader sh = Shader.Find("Unlit/Texture");
+		//Shader sh = Shader.Find("Unlit/Texture");
+		Shader sh = Shader.Find("Unlit/Transparent");
 		wall.renderer.material.shader=sh;
 	}
 	
@@ -48,12 +49,12 @@ public class Temp : MonoBehaviour {
 				Color32 c = tex.GetPixel(j,i);
 				if(b==0)
 				{
-					c=Color32.Lerp(c,new Color32(0,0,255,255),t);
+					c=Color32.Lerp(c,new Color32(0,0,255,255),Time.deltaTime);
 					tex.SetPixel(j,i,c);
 				}
 				else
 				{
-					c=Color32.Lerp(c,new Color32(255,0,0,255),t);
+					c=Color32.Lerp(c,new Color32(255,0,0,0),Time.deltaTime);
 					tex.SetPixel(j,i,c);
 				}
 				pos++;

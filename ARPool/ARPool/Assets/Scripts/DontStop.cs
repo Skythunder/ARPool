@@ -81,7 +81,7 @@ public class DontStop : MonoBehaviour {
 		ArrayList temp = new ArrayList();
 		for(int i=0;i<floatArr.Length;i+=2)
 		{
-			Vector3 wp = new Vector3(floatArr[i]-(icols/2),floatArr[i+1]-(irows/2),4f);
+			Vector3 wp = new Vector3(floatArr[i],floatArr[i+1],4f);
 			
 			GameObject go; 
 			go = GameObject.Find(wp.ToString());
